@@ -89,6 +89,5 @@ public class RandomizedSet {
         System.out.println(param_2);
         int param_3 = obj.getRandom();
         System.out.println(param_3);
-
     }
 }
