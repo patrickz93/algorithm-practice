@@ -9,6 +9,15 @@ import java.util.Stack;
  * @date 2021-04-29 07:07
  * @desc 循环遍历二叉树
  * https://www.jianshu.com/p/456af5480cee
+ * 思路模板：
+ *  while (node != null || !stack.isEmpty()) {
+ *      while (node != null) {
+ *          stack.push(node);
+ *          node = node.left;
+ *      }
+ *
+ *      ...
+ *  }
  */
 public class IteratorTree {
     public void preOrder(TreeNode root) {
