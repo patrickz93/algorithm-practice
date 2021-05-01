@@ -2,6 +2,9 @@ package zhh.algorithm.lucifer.basic.day1.array;
 
 import org.junit.Assert;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author zhanghao
  * @date 2021-05-01 15:12
@@ -57,7 +60,8 @@ public class PreSum {
             S += n;
         }
 
-        int A = 0; // A 为前缀和
+        // A 为前缀和
+        int A = 0;
         // 迭代计算前缀和
         for (int i = 0; i < nums.length; i++) {
             int x = nums[i];
@@ -65,9 +69,77 @@ public class PreSum {
                 // 满足公式中的关系，x 是枢纽元素
                 return i;
             }
-            A += x; // 计算前缀和
+            // 计算前缀和
+            A += x;
         }
         return -1;
+    }
+
+    /**
+     * 给定一个整数数组和一个整数 k，你需要找到该数组中和为 k 的连续的子数组的个数。
+     *
+     * 示例 1 :
+     *
+     * 输入:nums = [1,1,1], k = 2
+     * 输出: 2 , [1,1] 与 [1,1] 为两种不同的情况。
+     *
+     *  空间复杂度：O(n)
+     *  时间复杂度：O(n²)
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int subArraySum(int[] nums, int k) {
+        int [] preSum = new int[nums.length+1];
+        for (int i = 0; i < nums.length; i++) {
+            preSum[i+1] = preSum[i] + nums[i];
+        }
+
+        // sum of nums[i..j) = sum of nums[0..j) - sum of nums[0..i)
+        int count = 0;
+        for (int i = 0; i <= nums.length; i++) {
+            for (int j = i+1; j <= nums.length; j++) {
+                // 前缀和相减求子数组之和
+                if (preSum[j] - preSum[i] == k) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 在计算前缀和的同时把前缀和的每个值出现的次数都记录在哈希表中
+     * 空间复杂度：O(n)
+     * 时间复杂度：O(n)
+     * @param nums
+     * @param k
+     * @return
+     */
+    public int subArraySumHash(int[] nums, int k) {
+        // 前缀和 -> 该前缀和（的值）出现的次数
+        Map<Integer, Integer> preSum = new HashMap<>();
+        // base case，前缀和 0 出现 1 次
+        preSum.put(0, 1);
+
+        // 前缀和
+        int sum = 0;
+        int res = 0;
+        for (int n : nums) {
+            // 计算前缀和
+            sum += n;
+            // 查找有多少个 sum[i] 等于 sum[j] - k
+            if (preSum.containsKey(sum - k)) {
+                res += preSum.get(sum - k);
+            }
+            // 更新 sum[j] 的个数
+            if (preSum.containsKey(sum)) {
+                preSum.put(sum, preSum.get(sum) + 1);
+            } else {
+                preSum.put(sum, 1);
+            }
+        }
+        return res;
     }
 
     public static void main(String[] args) {
@@ -79,6 +151,8 @@ public class PreSum {
         int[] pivotIndexArr2 = {2, 1, -1};
         Assert.assertEquals(0, preSum.pivotIndex(pivotIndexArr2));
 
-
+        int[] subArraySumArr = {1,1,1};
+        Assert.assertEquals(2, preSum.subArraySum(subArraySumArr, 2));
+        Assert.assertEquals(2, preSum.subArraySumHash(subArraySumArr,2));
     }
 }
