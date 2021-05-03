@@ -11,6 +11,7 @@ import java.util.Map;
  * @desc 前缀和——解决数组区间之和的问题
  * 前缀和数组的定义中使用了左闭右开区间[)。这种表示方法的优点之一是很容易做区间的减法。
  * 题目与「子数组求和」有关 => 前缀和
+ * https://www.cxyxiaowu.com/11326.html
  */
 public class PreSum {
     /**
