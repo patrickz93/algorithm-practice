@@ -3,9 +3,7 @@ package zhh.algorithm.lucifer.basic.day1.stack;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author zhanghao
@@ -72,6 +70,69 @@ public class MonostoneStack {
         return ans;
     }
 
+    /**
+     * 84. 柱状图中最大的矩形
+     * https://leetcode-cn.com/problems/largest-rectangle-in-histogram/
+     * 示例:
+     * 输入: [2,1,5,6,2,3]
+     * 输出: 10
+     *
+     * 空间复杂度：O(n)
+     * 时间复杂度：O(n)
+     * @param heights
+     * @return
+     */
+    public int largestRectangleArea(int[] heights) {
+        if (heights.length == 0 || heights.length == 1) {
+            return heights.length == 0 ? 0 : heights[0];
+        }
+
+        // 哨兵技巧 -> 解决边界问题
+        int[] heightsWithSentinel = new int[heights.length + 2];
+        System.arraycopy(heights, 0, heightsWithSentinel, 1, heights.length);
+
+        Deque<Integer> stack = new ArrayDeque<>();
+        int current = 1, area = 0;
+        stack.addLast(0);
+        while (current < heightsWithSentinel.length) {
+            // 栈中弹出的元素 都是高度大于当前柱子高度的柱子
+            while (heightsWithSentinel[current] < heightsWithSentinel[stack.peekLast()]) {
+                int height = heightsWithSentinel[stack.removeLast()];
+                int width = current - stack.peekLast() - 1;
+                // 计算的面积为弹出的柱子高度 * 【弹出柱子的下标,当前柱子的下标)长度
+                area = Math.max(area, height * width);
+            }
+            stack.addLast(current++);
+        }
+        return area;
+    }
+
+    /**
+     * 739. Daily Temperatures
+     * Given a list of daily temperatures T, return a list such that, for each day in the input, tells you how many days you would have to wait until a warmer temperature. If there is no future day for which this is possible, put 0 instead.
+     * For example, given the list of temperatures T = [73, 74, 75, 71, 69, 72, 76, 73], your output should be [1, 1, 4, 2, 1, 1, 0, 0].
+     * Note: The length of temperatures will be in the range [1, 30000]. Each temperature will be an integer in the range [30, 100].
+     *
+     * 时间复杂度：O(n)
+     * 空间复杂度：O(n)
+     * @param temperatures
+     * @return
+     */
+    public int[] dailyTemperatures(int[] temperatures) {
+        Deque<Integer> stack = new ArrayDeque<>();
+        int[] result = new int[temperatures.length];
+        int current = 0;
+        while (current < temperatures.length) {
+            while (!stack.isEmpty() && temperatures[current] > temperatures[stack.peekLast()]) {
+                Integer index = stack.removeLast();
+                result[index] = current - index;
+            }
+            stack.addLast(current++);
+        }
+
+        return result;
+    }
+
     public static void main(String[] args) {
         MonostoneStack monostoneStack = new MonostoneStack();
 
@@ -81,5 +142,12 @@ public class MonostoneStack {
 
         int[] trapInput = {0,1,0,2,1,0,1,3,2,1,2,1};
         Assert.assertEquals(6,monostoneStack.trapRainWater(trapInput));
+
+        int[] largestRectangleInput = {2,1,5,6,2,3};
+        Assert.assertEquals(10, monostoneStack.largestRectangleArea(largestRectangleInput));
+
+        int[] dailyTemperatureInput = {73, 74, 75, 71, 69, 72, 76, 73};
+        int[] dailyTemperatureOutput = {1, 1, 4, 2, 1, 1, 0, 0};
+        Assert.assertArrayEquals(dailyTemperatureOutput, monostoneStack.dailyTemperatures(dailyTemperatureInput));
     }
 }
