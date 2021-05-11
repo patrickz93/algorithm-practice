@@ -74,10 +74,51 @@ public class SlidingWindow {
         return minSubArrayLen == Integer.MAX_VALUE ? 0 : minSubArrayLen;
     }
 
+    /**
+     * 930. 和相同的二元子数组
+     * 在由若干 0 和 1  组成的数组 A 中，有多少个和为 S 的非空子数组。
+     *
+     * 示例：
+     * 输入：A = [1,0,1,0,1], S = 2
+     * 输出：4
+     *
+     * 思路：可变窗口
+     *
+     * 时间复杂度：O()
+     * 空间复杂度：O()
+     * @param A
+     * @param S
+     * @return
+     */
+    public int atMost(int[] A, int S) {
+        if (S < 0) return 0;
+
+        int windowLeftIndex = 0, windowRightIndex = 0, num = 0;
+        while (windowRightIndex < A.length) {
+            S -= A[windowRightIndex];
+            while (S < 0) {
+                S += A[windowLeftIndex];
+                windowLeftIndex++;
+            }
+            num += windowRightIndex - windowLeftIndex + 1;
+            windowRightIndex++;
+        }
+
+        return num;
+    }
+
+    public int numSubarraysWithSum(int[] A, int S) {
+        return atMost(A, S) - atMost(A, S - 1);
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
         int[] minSubArrayLenInput1 = {2,3,1,2,4,3};
         Assert.assertEquals(2, slidingWindow.minSubArrayLen(7, minSubArrayLenInput1));
+
+        int[] numSubarraysWithSumInput = {1,0,1,0,1};
+        int S = 2;
+        Assert.assertEquals(4, slidingWindow.numSubarraysWithSum(numSubarraysWithSumInput,S));
     }
 }
