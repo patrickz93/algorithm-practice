@@ -2,6 +2,10 @@ package zhh.algorithm.lucifer.basic.day1.array;
 
 import org.junit.Assert;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author zhanghao
  * @date 2021-05-08 06:47
@@ -24,6 +28,8 @@ import org.junit.Assert;
  *       慢指针移动
  *    更新答案
  *  返回 ans
+ *
+ *  leetcode 3,209,424,438,567
  */
 public class SlidingWindow {
     /**
@@ -169,6 +175,70 @@ public class SlidingWindow {
         return res;
     }
 
+    /**
+     * 76. 最小覆盖子串
+     * 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
+     * 注意：如果 s 中存在这样的子串，我们保证它是唯一的答案。
+     * 示例 1：
+     * 输入：s = "ADOBECODEBANC", t = "ABC"
+     * 输出："BANC"
+     *
+     *  示例 2：
+     * 输入：s = "a", t = "a"
+     * 输出："a"
+     *
+     *  提示：
+     * 1 <= s.length, t.length <= 105
+     * s 和 t 由英文字母组成
+     *
+     * 进阶：你能设计一个在 o(n) 时间内解决此问题的算法吗？
+     * 链接：https://leetcode-cn.com/problems/minimum-window-substring
+     *
+     * 时间复杂度：每次检查是否可行会遍历整个 t 的哈希表，哈希表的大小与字符集的大小有关，设字符集大小为 C, O(C⋅∣s∣+∣t∣)
+     * 空间复杂度：这里用了两张哈希表作为辅助空间，每张哈希表最多不会存放超过字符集大小的键值对，我们设字符集大小为 C ,O(C)
+     * @param s
+     * @param t
+     * @return
+     */
+    private Map<Character, Integer> subStringCharMap = new HashMap<>();
+    private Map<Character, Integer> cnt = new HashMap<>();
+    public String minWindow(String s, String t) {
+
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            subStringCharMap.put(c, subStringCharMap.getOrDefault(c, 0)+1);
+        }
+
+        String ans = s + "1";
+        int wL = 0, wR = 0;
+        while (wR < s.length()) {
+            String windowString = s.substring(wL, wR + 1);
+            char c = s.charAt(wR);
+            cnt.put(c, cnt.getOrDefault(c, 0)+1);
+
+            while (containsSubString()) {
+                ans = windowString.length() < ans.length() ? windowString : ans;
+                char updateChar = s.charAt(wL);
+                wL++;
+                cnt.put(updateChar, cnt.get(updateChar)-1);
+                windowString = s.substring(wL, wR + 1);
+            }
+
+            wR++;
+        }
+        return ans.length() > s.length() ? "" : ans;
+    }
+
+    private boolean containsSubString() {
+        Set<Map.Entry<Character, Integer>> entries = subStringCharMap.entrySet();
+        for (Map.Entry<Character, Integer> entry : entries) {
+            if (!cnt.containsKey(entry.getKey()) || cnt.get(entry.getKey()) < entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -181,5 +251,8 @@ public class SlidingWindow {
 
         int[] maxTurbulenceSizeInput = {9,4,2,10,7,8,8,1,9};
         Assert.assertEquals(5,slidingWindow.maxTurbulenceSize(maxTurbulenceSizeInput));
+
+        String s = "bbaa", t = "aba";
+        Assert.assertEquals("baa", slidingWindow.minWindow(s, t));
     }
 }
