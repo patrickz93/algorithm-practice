@@ -239,6 +239,69 @@ public class SlidingWindow {
         return true;
     }
 
+    /**
+     * 1658. 将 x 减到 0 的最小操作数
+     * 给你一个整数数组 nums 和一个整数 x 。每一次操作时，你应当移除数组 nums 最左边或最右边的元素，然后从 x 中减去该元素的值。请注意，需要 修改 数组以供接下来的操作使用。
+     * 如果可以将 x 恰好 减到 0 ，返回 最小操作数 ；否则，返回 -1 。
+     *  
+     * 示例 1：
+     * 输入：nums = [1,1,4,2,3], x = 5
+     * 输出：2
+     * 解释：最佳解决方案是移除后两个元素，将 x 减到 0 。
+     *
+     * 示例 2：
+     * 输入：nums = [5,6,7,8,9], x = 4
+     * 输出：-1
+     *
+     * 示例 3：
+     * 输入：nums = [3,2,20,1,1,3], x = 10
+     * 输出：5
+     * 解释：最佳解决方案是移除后三个元素和前两个元素（总共 5 次操作），将 x 减到 0 。
+     *
+     * 提示：
+     * 1 <= nums.length <= 105
+     * 1 <= nums[i] <= 104
+     * 1 <= x <= 109
+     *
+     * 链接：https://leetcode-cn.com/problems/minimum-operations-to-reduce-x-to-zero
+     *
+     * 时间复杂度：O(n)
+     * 空间复杂度：O(1)
+     * @param nums
+     * @param x
+     * @return
+     */
+    public int minOperations(int[] nums, int x) {
+        // 即：我们剩下的数组一定是原数组的中间部分。
+        // 那是不是就是说，我们只要知道数据中子序和等于 sum(nums) - x 的长度。用 nums 的长度减去它就好了？
+        // 由于我们的目标是最小操作数，因此我们只要求和为定值的最长子序列，这是一个典型的滑动窗口问题。
+        int numsSum = 0;
+        for (int num : nums) {
+            numsSum += num;
+        }
+        if (numsSum == x) {
+            return nums.length;
+        }
+        int wL = 0, wR = 0, tempSum = 0;
+        int maxSubStringLen = -1;
+        while (wR < nums.length) {
+            tempSum += nums[wR];
+            while ((numsSum - x <= tempSum) && (wL <= wR) ) {
+                if (numsSum - x == tempSum) {
+                    maxSubStringLen = Math.max(maxSubStringLen, wR - wL + 1);
+                }
+                tempSum -= nums[wL];
+                wL++;
+            }
+            wR++;
+        }
+        if (maxSubStringLen < 0) {
+            return -1;
+        } else {
+            return nums.length - maxSubStringLen;
+        }
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -254,5 +317,16 @@ public class SlidingWindow {
 
         String s = "bbaa", t = "aba";
         Assert.assertEquals("baa", slidingWindow.minWindow(s, t));
+
+        int[] minOperationsInput1 = {3,2,20,1,1,3}; int minOperationsOutput1 = 5; int x1 = 10;
+        Assert.assertEquals(minOperationsOutput1,slidingWindow.minOperations(minOperationsInput1,x1));
+        int[] minOperationsInput2 = {5,6,7,8,9}; int minOperationsOutput2 = -1; int x2 = 4;
+        Assert.assertEquals(minOperationsOutput2,slidingWindow.minOperations(minOperationsInput2,x2));
+        int[] minOperationsInput3 = {1,1,4,2,3}; int minOperationsOutput3 = 2; int x3 = 5;
+        Assert.assertEquals(minOperationsOutput3,slidingWindow.minOperations(minOperationsInput3,x3));
+        int[] minOperationsInput4 = {8828, 9581, 49, 9818, 9974, 9869, 9991, 10000, 10000, 10000, 9999, 9993, 9904, 8819, 1231, 6309};
+        int minOperationsOutput4 = 16; int x4 = 1343365;
+        Assert.assertEquals(minOperationsOutput4, slidingWindow.minOperations(minOperationsInput4, x4));
+
     }
 }
