@@ -302,6 +302,75 @@ public class SlidingWindow {
         }
     }
 
+    /**
+     * 3. 无重复字符的最长子串
+     * 给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+     *
+     * 示例 1:
+     * 输入: s = "abcabcbb"
+     * 输出: 3
+     * 解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+     *
+     * 示例 2:
+     * 输入: s = "bbbbb"
+     * 输出: 1
+     * 解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+     *
+     * 示例 3:
+     * 输入: s = "pwwkew"
+     * 输出: 3
+     * 解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     *      请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+     *
+     * 示例 4:
+     * 输入: s = ""
+     * 输出: 0
+     *
+     * 提示：
+     * 0 <= s.length <= 5 * 104
+     * s 由英文字母、数字、符号和空格组成
+     * 链接：https://leetcode-cn.com/problems/longest-substring-without-repeating-characters
+     *
+     * 时间复杂度：O()
+     * 空间复杂度：O()
+     * @param s
+     * @return
+     */
+    public int lengthOfLongestSubstring(String s) {
+        if ("".equals(s)) {
+            return 0;
+        }
+
+        Map<Character, Integer> cnt = new HashMap<>();
+        int wL = 0, wR = 1;
+        cnt.put(s.charAt(wL), 1);
+        int length = 1;
+        while (wR < s.length()) {
+            cnt.put(s.charAt(wR), cnt.getOrDefault(s.charAt(wR), 0)+1);
+            while (!unique(cnt)) {
+                cnt.put(s.charAt(wL), cnt.get(s.charAt(wL))-1);
+                if (cnt.get(s.charAt(wL)) == 0) {
+                    cnt.remove(s.charAt(wL));
+                }
+                wL++;
+            }
+            length = Math.max(length, cnt.keySet().size());
+            wR++;
+        }
+
+        return length;
+    }
+
+    private boolean unique(Map<Character, Integer> cnt) {
+        for (Map.Entry<Character, Integer> entry : cnt.entrySet()) {
+            Integer value = entry.getValue();
+            if (value > 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -325,8 +394,17 @@ public class SlidingWindow {
         int[] minOperationsInput3 = {1,1,4,2,3}; int minOperationsOutput3 = 2; int x3 = 5;
         Assert.assertEquals(minOperationsOutput3,slidingWindow.minOperations(minOperationsInput3,x3));
         int[] minOperationsInput4 = {8828, 9581, 49, 9818, 9974, 9869, 9991, 10000, 10000, 10000, 9999, 9993, 9904, 8819, 1231, 6309};
-        int minOperationsOutput4 = 16; int x4 = 1343365;
+        int minOperationsOutput4 = 16; int x4 = 134365;
         Assert.assertEquals(minOperationsOutput4, slidingWindow.minOperations(minOperationsInput4, x4));
+
+        String longestSubStringInput1 = "abcabcbb"; int longestSubStringOutput1 = 3;
+        Assert.assertEquals(longestSubStringOutput1,slidingWindow.lengthOfLongestSubstring(longestSubStringInput1));
+        String longestSubStringInput2 = "bbbbb"; int longestSubStringOutput2 = 1;
+        Assert.assertEquals(longestSubStringOutput2,slidingWindow.lengthOfLongestSubstring(longestSubStringInput2));
+        String longestSubStringInput3 = "pwwkew"; int longestSubStringOutput3 = 3;
+        Assert.assertEquals(longestSubStringOutput3,slidingWindow.lengthOfLongestSubstring(longestSubStringInput3));
+        String longestSubStringInput4 = "aab"; int longestSubStringOutput4 = 2;
+        Assert.assertEquals(longestSubStringOutput4,slidingWindow.lengthOfLongestSubstring(longestSubStringInput4));
 
     }
 }
