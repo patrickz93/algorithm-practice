@@ -2,9 +2,7 @@ package zhh.algorithm.lucifer.basic.day1.array;
 
 import org.junit.Assert;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zhanghao
@@ -331,7 +329,7 @@ public class SlidingWindow {
      * s 由英文字母、数字、符号和空格组成
      * 链接：https://leetcode-cn.com/problems/longest-substring-without-repeating-characters
      *
-     * 时间复杂度：O(N+K),N为字符串长度，K为自创不一致字母的个数
+     * 时间复杂度：O(NK),N为字符串长度，K为自创不一致字母的个数
      * 空间复杂度：O(K),K为子串不一致字母的个数
      * @param s
      * @return
@@ -389,7 +387,7 @@ public class SlidingWindow {
      * 子串 "BBBB" 有最长重复字母, 答案为 4。
      * 链接：https://leetcode-cn.com/problems/longest-repeating-character-replacement
      *
-     * 时间复杂度：O(N+K),N为字符串长度，K为自创不一致字母的个数
+     * 时间复杂度：O(NK),N为字符串长度，K为自创不一致字母的个数
      * 空间复杂度：O(K),K为子串不一致字母的个数
      * @param s
      * @param k
@@ -433,6 +431,70 @@ public class SlidingWindow {
         return sum - maxCnt > k;
     }
 
+    /**
+     * 438. 找到字符串中所有字母异位词
+     * 定一个字符串 s 和一个非空字符串 p，找到 s 中所有是 p 的字母异位词的子串，返回这些子串的起始索引。
+     * 字符串只包含小写英文字母，并且字符串 s 和 p 的长度都不超过 20100。
+     *
+     * 说明：
+     * 字母异位词指字母相同，但排列不同的字符串。
+     * 不考虑答案输出的顺序。
+     *
+     *  示例 1:
+     * 输入:
+     * s: "cbaebabacd" p: "abc"
+     * 输出:
+     * [0, 6]
+     * 解释:
+     * 起始索引等于 0 的子串是 "cba", 它是 "abc" 的字母异位词。
+     * 起始索引等于 6 的子串是 "bac", 它是 "abc" 的字母异位词。
+     *
+     * 示例 2:
+     * 输入:
+     * s: "abab" p: "ab"
+     * 输出:
+     * [0, 1, 2]
+     * 解释:
+     * 起始索引等于 0 的子串是 "ab", 它是 "ab" 的字母异位词。
+     * 起始索引等于 1 的子串是 "ba", 它是 "ab" 的字母异位词。
+     * 起始索引等于 2 的子串是 "ab", 它是 "ab" 的字母异位词。
+     *
+     * 链接：https://leetcode-cn.com/problems/find-all-anagrams-in-a-string
+     *
+     * 时间复杂度：O(n*C),C是字符串p的长度
+     * 空间复杂度：O(∣Σ∣),∣Σ∣=26,是所有小写字母的长度
+     * @param s
+     * @param p
+     * @return
+     */
+    public List<Integer> findAnagrams(String s, String p) {
+        if ("".equals(s)) {
+            return new ArrayList<>();
+        }
+
+        int[] charCnt = new int[26];
+        for (char pChar : p.toCharArray()) {
+            ++charCnt[pChar - 'a'];
+        }
+
+        int wL = 0, wR = 0;
+        List<Integer> ans = new ArrayList<>();
+        int[] windowCharCnt = new int[26];
+        while (wR < s.length()) {
+            ++windowCharCnt[s.charAt(wR)-'a'];
+            if (wR - wL + 1 == p.length()) {
+                if (Arrays.equals(windowCharCnt, charCnt)) {
+                    ans.add(wL);
+                }
+                --windowCharCnt[s.charAt(wL)-'a'];
+                ++wL;
+            }
+            ++wR;
+        }
+
+        return ans;
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -472,5 +534,10 @@ public class SlidingWindow {
         Assert.assertEquals(characterReplacementOutput1, slidingWindow.characterReplacement(characterReplacementInput1,k1));
         String characterReplacementInput2 = "AABABBA"; int k2 = 1; int characterReplacementOutput2 = 4;
         Assert.assertEquals(characterReplacementOutput2, slidingWindow.characterReplacement(characterReplacementInput2,k2));
+
+        String findAnagramsS1 = "cbaebabacd"; String findAnagramsP1 = "abc"; List<Integer> findAnagramsOutput1 = Arrays.asList(0,6);
+        Assert.assertArrayEquals(findAnagramsOutput1.toArray(), slidingWindow.findAnagrams(findAnagramsS1, findAnagramsP1).toArray());
+        String findAnagramsS2 = "abab"; String findAnagramsP2 = "ab"; List<Integer> findAnagramsOutput2 = Arrays.asList(0,1,2);
+        Assert.assertArrayEquals(findAnagramsOutput2.toArray(), slidingWindow.findAnagrams(findAnagramsS2, findAnagramsP2).toArray());
     }
 }
