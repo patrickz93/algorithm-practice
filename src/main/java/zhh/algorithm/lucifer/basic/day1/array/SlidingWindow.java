@@ -331,8 +331,8 @@ public class SlidingWindow {
      * s 由英文字母、数字、符号和空格组成
      * 链接：https://leetcode-cn.com/problems/longest-substring-without-repeating-characters
      *
-     * 时间复杂度：O()
-     * 空间复杂度：O()
+     * 时间复杂度：O(N+K),N为字符串长度，K为自创不一致字母的个数
+     * 空间复杂度：O(K),K为子串不一致字母的个数
      * @param s
      * @return
      */
@@ -371,6 +371,68 @@ public class SlidingWindow {
         return true;
     }
 
+    /**
+     * 424. 替换后的最长重复字符
+     * 给你一个仅由大写英文字母组成的字符串，你可以将任意位置上的字符替换成另外的字符，总共可最多替换 k 次。在执行上述操作后，找到包含重复字母的最长子串的长度。
+     * 注意：字符串长度 和 k 不会超过 104。
+     *
+     * 示例 1：
+     * 输入：s = "ABAB", k = 2
+     * 输出：4
+     * 解释：用两个'A'替换为两个'B',反之亦然。
+     *
+     * 示例 2：
+     * 输入：s = "AABABBA", k = 1
+     * 输出：4
+     * 解释：
+     * 将中间的一个'A'替换为'B',字符串变为 "AABBBBA"。
+     * 子串 "BBBB" 有最长重复字母, 答案为 4。
+     * 链接：https://leetcode-cn.com/problems/longest-repeating-character-replacement
+     *
+     * 时间复杂度：O(N+K),N为字符串长度，K为自创不一致字母的个数
+     * 空间复杂度：O(K),K为子串不一致字母的个数
+     * @param s
+     * @param k
+     * @return
+     */
+    public int characterReplacement(String s, int k) {
+        if ("".equals(s)) {
+            return 0;
+        }
+
+        Map<Character, Integer> windowCharCnt = new HashMap<>();
+        int wL = 0, wR = 1;
+        windowCharCnt.put(s.charAt(wL), 1);
+        int ans = 1;
+        while (wR < s.length()) {
+            char rightChar = s.charAt(wR);
+            Integer rightCharCnt = windowCharCnt.getOrDefault(rightChar, 0);
+            windowCharCnt.put(rightChar, rightCharCnt+1);
+            while (leftMove(windowCharCnt, k)) {
+                char leftChar = s.charAt(wL);
+                Integer leftCharCnt = windowCharCnt.get(leftChar);
+                windowCharCnt.put(leftChar, leftCharCnt -1);
+                wL++;
+            }
+            ans = Math.max(ans, wR - wL + 1);
+            wR++;
+        }
+
+        return ans;
+    }
+
+    private boolean leftMove (Map<Character, Integer> cnt, int k) {
+        int sum = 0;
+        int maxCnt = 1;
+        for (Map.Entry<Character, Integer> entry : cnt.entrySet()) {
+            Integer charCnt = entry.getValue();
+            sum += charCnt;
+            maxCnt = Math.max(maxCnt, charCnt);
+        }
+
+        return sum - maxCnt > k;
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -406,5 +468,9 @@ public class SlidingWindow {
         String longestSubStringInput4 = "aab"; int longestSubStringOutput4 = 2;
         Assert.assertEquals(longestSubStringOutput4,slidingWindow.lengthOfLongestSubstring(longestSubStringInput4));
 
+        String characterReplacementInput1 = "ABAB"; int k1 = 2; int characterReplacementOutput1 = 4;
+        Assert.assertEquals(characterReplacementOutput1, slidingWindow.characterReplacement(characterReplacementInput1,k1));
+        String characterReplacementInput2 = "AABABBA"; int k2 = 1; int characterReplacementOutput2 = 4;
+        Assert.assertEquals(characterReplacementOutput2, slidingWindow.characterReplacement(characterReplacementInput2,k2));
     }
 }
