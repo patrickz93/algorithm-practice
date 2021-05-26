@@ -495,6 +495,74 @@ public class SlidingWindow {
         return ans;
     }
 
+    /**
+     * 567. 字符串的排列
+     * 给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。
+     * 换句话说，第一个字符串的排列之一是第二个字符串的 子串 。
+     *
+     * 示例 1：
+     * 输入: s1 = "ab" s2 = "eidbaooo"
+     * 输出: True
+     * 解释: s2 包含 s1 的排列之一 ("ba").
+     *
+     * 示例 2：
+     * 输入: s1= "ab" s2 = "eidboaoo"
+     * 输出: False
+     *
+     * 提示：
+     * 输入的字符串只包含小写字母
+     * 两个字符串的长度都在 [1, 10,000] 之间
+     *
+     * 链接：https://leetcode-cn.com/problems/permutation-in-string
+     *
+     * 时间复杂度：O(s1+s2+∣Σ∣),∣Σ∣=26,是所有小写字母的长度
+     * 空间复杂度：O(∣Σ∣),∣Σ∣=26,是所有小写字母的长度
+     * @param s1
+     * @param s2
+     * @return
+     */
+    public boolean checkInclusion(String s1, String s2) {
+        if (s2.length() < s1.length()) {
+            return false;
+        }
+
+        Map<Character, Integer> mapCnt = new HashMap<>();
+        for (char c : s1.toCharArray()) {
+            mapCnt.put(c, mapCnt.getOrDefault(c, 0)+1);
+        }
+
+        int wL = 0, wR = 0;
+        int[] cnt = new int[26];
+        boolean inclusion = true;
+        while (wR < s2.length()) {
+            while (wR - wL + 1 <= s1.length()) {
+                char rightChar = s2.charAt(wR);
+                ++cnt[rightChar - 'a'];
+                wR++;
+            }
+
+            for (Map.Entry<Character,Integer> entry : mapCnt.entrySet()) {
+                char charValue = entry.getKey();
+                Integer chatCnt = entry.getValue();
+                if (cnt[charValue - 'a'] != chatCnt) {
+                    inclusion = false;
+                    break;
+                }
+            }
+
+            if (inclusion) {
+                return true;
+            }
+
+            char leftChar = s2.charAt(wL);
+            --cnt[leftChar - 'a'];
+            wL++;
+            inclusion = true;
+        }
+
+        return false;
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -539,5 +607,10 @@ public class SlidingWindow {
         Assert.assertArrayEquals(findAnagramsOutput1.toArray(), slidingWindow.findAnagrams(findAnagramsS1, findAnagramsP1).toArray());
         String findAnagramsS2 = "abab"; String findAnagramsP2 = "ab"; List<Integer> findAnagramsOutput2 = Arrays.asList(0,1,2);
         Assert.assertArrayEquals(findAnagramsOutput2.toArray(), slidingWindow.findAnagrams(findAnagramsS2, findAnagramsP2).toArray());
+
+        String checkInclusionInput1S1 = "ab", checkInclusionInput1S2 = "eidbaooo";
+        Assert.assertTrue(slidingWindow.checkInclusion(checkInclusionInput1S1,checkInclusionInput1S2));
+        String checkInclusionInput2S1 = "ab", checkInclusionInput2S2 = "eidboaoo";
+        Assert.assertFalse(slidingWindow.checkInclusion(checkInclusionInput2S1,checkInclusionInput2S2));
     }
 }
