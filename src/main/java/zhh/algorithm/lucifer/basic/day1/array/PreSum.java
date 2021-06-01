@@ -321,7 +321,7 @@ public class PreSum {
      * 空间复杂度：O(1)
      * 思路：
      *  求连续字数组个数 => 前缀和
-     *  母体3和母体5，可以获得betweenK的数量，直接套用公式即可
+     *  母题3和母题5，可以获得betweenK的数量，直接套用公式即可
      *
      * 链接：https://leetcode-cn.com/problems/number-of-subarrays-with-bounded-maximum
      * @param nums
