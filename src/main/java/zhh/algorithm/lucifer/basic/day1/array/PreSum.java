@@ -12,7 +12,7 @@ import java.util.Map;
  * @date 2021-05-01 15:12
  * @desc 前缀和——解决数组区间之和的问题
  * 前缀和数组的定义中使用了左闭右开区间[)。这种表示方法的优点之一是很容易做区间的减法。
- * 题目与「子数组求和」有关 => 前缀和
+ * 题目与「子数组求和」有关、且数组是连续的 => 前缀和
  * https://www.cxyxiaowu.com/11326.html
  * https://github.com/azl397985856/leetcode/blob/master/selected/atMostK.md
  */
@@ -300,6 +300,39 @@ public class PreSum {
         return lengthMap.values().stream().reduce(Integer::sum).orElse(0);
     }
 
+    /**
+     * 795. 区间子数组个数
+     * 给定一个元素都是正整数的数组A ，正整数 L 以及 R (L <= R)。
+     * 求连续、非空且其中最大元素满足大于等于L 小于等于R的子数组个数。
+     *
+     * 例如 :
+     * 输入:
+     * A = [2, 1, 4, 3]
+     * L = 2
+     * R = 3
+     * 输出: 3
+     * 解释: 满足条件的子数组: [2], [2, 1], [3].
+     *
+     * 注意:
+     * L, R  和 A[i] 都是整数，范围在 [0, 10^9]。
+     * 数组 A 的长度范围在[1, 50000]。
+     *
+     * 时间复杂度：O(n)
+     * 空间复杂度：O(1)
+     * 思路：
+     *  求连续字数组个数 => 前缀和
+     *  母体3和母体5，可以获得betweenK的数量，直接套用公式即可
+     *
+     * 链接：https://leetcode-cn.com/problems/number-of-subarrays-with-bounded-maximum
+     * @param nums
+     * @param left
+     * @param right
+     * @return
+     */
+    public int numSubarrayBoundedMax(int[] nums, int left, int right) {
+        return betweenK(nums, right, left);
+    }
+
     public static void main(String[] args) {
         PreSum preSum = new PreSum();
         int[] a = {1,2,3,4,5,6};
@@ -328,5 +361,7 @@ public class PreSum {
         String findSubstringInWraproundStringP3 = "zab";
         Assert.assertEquals(6,preSum.findSubstringInWraproundString(findSubstringInWraproundStringP3));
 
+        int[] numSubarrayBoundedMaxInput = {2, 1, 4, 3};
+        Assert.assertEquals(3, preSum.numSubarrayBoundedMax(numSubarrayBoundedMaxInput, 2, 3));
     }
 }
