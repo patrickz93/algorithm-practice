@@ -563,6 +563,80 @@ public class SlidingWindow {
         return false;
     }
 
+
+    /**
+     * 904. 水果成篮
+     * 在一排树中，第 i 棵树产生 tree[i] 型的水果。
+     * 你可以从你选择的任何树开始，然后重复执行以下步骤：
+     * 1.把这棵树上的水果放进你的篮子里。如果你做不到，就停下来。
+     * 2.移动到当前树右侧的下一棵树。如果右边没有树，就停下来。
+     * 请注意，在选择一颗树后，你没有任何选择：你必须执行步骤 1，然后执行步骤 2，然后返回步骤 1，然后执行步骤 2，依此类推，直至停止。
+     * 你有两个篮子，每个篮子可以携带任何数量的水果，但你希望每个篮子只携带一种类型的水果。
+     * 用这个程序你能收集的水果树的最大总量是多少？
+     *
+     * 示例 1：
+     * 输入：[1,2,1]
+     * 输出：3
+     * 解释：我们可以收集 [1,2,1]。
+     *
+     * 示例 2：
+     * 输入：[0,1,2,2]
+     * 输出：3
+     * 解释：我们可以收集 [1,2,2]
+     * 如果我们从第一棵树开始，我们将只能收集到 [0, 1]。
+     *
+     * 示例 3：
+     * 输入：[1,2,3,2,2]
+     * 输出：4
+     * 解释：我们可以收集 [2,3,2,2]
+     * 如果我们从第一棵树开始，我们将只能收集到 [1, 2]。
+     *
+     * 示例 4：
+     * 输入：[3,3,3,1,2,1,1,2,3,3,4]
+     * 输出：5
+     * 解释：我们可以收集 [1,2,1,1,2]
+     * 如果我们从第一棵树或第八棵树开始，我们将只能收集到 4 棵水果树。
+     *
+     * 提示：
+     * 1 <= tree.length <= 40000
+     * 0 <= tree[i] < tree.length
+     *
+     * 链接：https://leetcode-cn.com/problems/fruit-into-baskets
+     *
+     * 时间复杂度：O(n)
+     * 空间复杂度：O(k)，数组中去重后数字的个数
+     * 思路：
+     *   即求仅包含两种数字的子数组的最大长度
+     *   连续、子数组 -> 滑动窗口
+     * @param tree
+     * @return
+     */
+    public int totalFruit(int[] tree) {
+        int wL = 0, wR = 0;
+        int ans = 0;
+        Map<Integer, Integer> cnt = new HashMap<>();
+        while (wR < tree.length) {
+            int right = tree[wR];
+            if (cnt.keySet().size() < 2 || cnt.containsKey(right)) {
+                cnt.put(right, cnt.getOrDefault(right, 0)+1);
+                wR++;
+                ans = Math.max(ans, cnt.values().stream().reduce(0, Integer::sum));
+            }
+
+            while (cnt.keySet().size() >= 2 && !cnt.containsKey(right)) {
+                int left = tree[wL];
+                if (cnt.get(left) - 1 == 0) {
+                    cnt.remove(left);
+                } else {
+                    cnt.put(left, cnt.get(left) - 1);
+                }
+                wL++;
+            }
+        }
+
+        return ans;
+    }
+
     public static void main(String[] args) {
         SlidingWindow slidingWindow = new SlidingWindow();
 
@@ -612,5 +686,14 @@ public class SlidingWindow {
         Assert.assertTrue(slidingWindow.checkInclusion(checkInclusionInput1S1,checkInclusionInput1S2));
         String checkInclusionInput2S1 = "ab", checkInclusionInput2S2 = "eidboaoo";
         Assert.assertFalse(slidingWindow.checkInclusion(checkInclusionInput2S1,checkInclusionInput2S2));
+
+        int[] totalFruitInput1 = {1,2,1};
+        Assert.assertEquals(3, slidingWindow.totalFruit(totalFruitInput1));
+        int[] totalFruitInput2 = {0,1,2,2};
+        Assert.assertEquals(3, slidingWindow.totalFruit(totalFruitInput2));
+        int[] totalFruitInput3 = {1,2,3,2,2};
+        Assert.assertEquals(4, slidingWindow.totalFruit(totalFruitInput3));
+        int[] totalFruitInput4 = {3,3,3,1,2,1,1,2,3,3,4};
+        Assert.assertEquals(5, slidingWindow.totalFruit(totalFruitInput4));
     }
 }
