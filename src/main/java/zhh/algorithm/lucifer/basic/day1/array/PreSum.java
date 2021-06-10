@@ -333,6 +333,68 @@ public class PreSum {
         return betweenK(nums, right, left);
     }
 
+    /**
+     * 992. K 个不同整数的子数组
+     * 给定一个正整数数组 A，如果 A 的某个子数组中不同整数的个数恰好为 K，则称 A 的这个连续、不一定不同的子数组为好子数组。
+     * （例如，[1,2,3,1,2] 中有 3 个不同的整数：1，2，以及 3。）
+     * 返回 A 中好子数组的数目。
+     *
+     * 示例 1：
+     * 输入：A = [1,2,1,2,3], K = 2
+     * 输出：7
+     * 解释：恰好由 2 个不同整数组成的子数组：[1,2], [2,1], [1,2], [2,3], [1,2,1], [2,1,2], [1,2,1,2].
+     *
+     *  示例 2：
+     * 输入：A = [1,2,1,3,4], K = 3
+     * 输出：3
+     * 解释：恰好由 3 个不同整数组成的子数组：[1,2,1,3], [2,1,3], [1,3,4].
+     *  
+     * 提示：
+     * 1 <= A.length <= 20000
+     * 1 <= A[i] <= A.length
+     * 1 <= K <= A.length
+     *
+     * 时间复杂度：O(n)
+     * 空间复杂度：O(k),k是数组中去重的数字的个数
+     *
+     * 思路：
+     *  求K个字数组的个数 = atMost(K)个字数组的个数 - atMost(K-1)个字数组的个数
+     *
+     * 链接：https://leetcode-cn.com/problems/subarrays-with-k-different-integers
+     * @param A
+     * @param K
+     * @return
+     */
+    public int subarraysWithKDistinct(int[] A, int K) {
+        return subarraysWithKDistinctAtMost(A, K) - subarraysWithKDistinctAtMost(A, K-1);
+    }
+
+    private int subarraysWithKDistinctAtMost(int[] A, int K) {
+        Map<Integer, Integer> cnt = new HashMap<>();
+        int wL = 0, wR = 0;
+        int res = 0;
+        while (wR < A.length) {
+            Integer rightCnt = cnt.getOrDefault(A[wR], 0);
+            if (rightCnt == 0) {
+                K--;
+            }
+            cnt.put(A[wR], rightCnt + 1);
+            while (K < 0) {
+                cnt.put(A[wL], cnt.get(A[wL])-1);
+                if (cnt.get(A[wL]) == 0) {
+                    K++;
+                }
+                wL++;
+            }
+
+            res += wR - wL + 1;
+            wR++;
+        }
+
+        return res;
+    }
+
+
     public static void main(String[] args) {
         PreSum preSum = new PreSum();
         int[] a = {1,2,3,4,5,6};
@@ -363,5 +425,10 @@ public class PreSum {
 
         int[] numSubarrayBoundedMaxInput = {2, 1, 4, 3};
         Assert.assertEquals(3, preSum.numSubarrayBoundedMax(numSubarrayBoundedMaxInput, 2, 3));
+
+        int[] subarraysWithKDistinctInput1 = {1,2,1,2,3}; int k1 = 2;
+        Assert.assertEquals(7, preSum.subarraysWithKDistinct(subarraysWithKDistinctInput1, k1));
+        int[] subarraysWithKDistinctInput2 = {1,2,1,3,4}; int k2 = 3;
+        Assert.assertEquals(3, preSum.subarraysWithKDistinct(subarraysWithKDistinctInput2, k2));
     }
 }
