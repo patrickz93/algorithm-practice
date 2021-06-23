@@ -2,8 +2,6 @@ package zhh.algorithm.lucifer.basic.day1.array;
 
 import org.junit.Assert;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -394,9 +392,56 @@ public class PreSum {
         return res;
     }
 
+    /**
+     * 303. 区域和检索 - 数组不可变
+     * 给定一个整数数组  nums，求出数组从索引 i 到 j（i ≤ j）范围内元素的总和，包含 i、j 两点。
+     * void int(int[] nums) 使用数组 nums 初始化对象
+     * int sumRange(int i, int j) 返回数组 nums 从索引 i 到 j（i ≤ j）范围内元素的总和，包含 i、j 两点（也就是 sum(nums[i], nums[i + 1], ... , nums[j])）
+     *
+     * 示例：
+     * 输入：
+     * ["NumArray", "sumRange", "sumRange", "sumRange"]
+     * [[[-2, 0, 3, -5, 2, -1]], [0, 2], [2, 5], [0, 5]]
+     * 输出：
+     * [null, 1, -1, -3]
+     * 解释：
+     * NumArray numArray = new NumArray([-2, 0, 3, -5, 2, -1]);
+     * numArray.sumRange(0, 2); // return 1 ((-2) + 0 + 3)
+     * numArray.sumRange(2, 5); // return -1 (3 + (-5) + 2 + (-1))
+     * numArray.sumRange(0, 5); // return -3 ((-2) + 0 + 3 + (-5) + 2 + (-1))
+     *  
+     * 提示：
+     * 0 <= nums.length <= 104
+     * -105 <= nums[i] <= 105
+     * 0 <= i <= j < nums.length
+     * 最多调用 104 次 sumRange 方法
+     *
+     * 链接：https://leetcode-cn.com/problems/range-sum-query-immutable
+     *
+     * 思路：
+     *  求数组 nums 从索引 i 到 j（i ≤ j）范围内元素的总和 => 前缀和 sum(j) - sum(i-1)
+     *
+     * 空间复杂度：sumRange = O(1), init = O(n)
+     * 时间复杂度：O(n)
+     */
+    private int[] preSum;
+
+    public void init(int[] nums) {
+        preSum = new int[nums.length+1];
+        for(int i = 0; i < nums.length; i++) {
+            preSum[i+1] = nums[i] + preSum[i];
+        }
+    }
+
+    public int sumRange(int left, int right) {
+        return preSum[right+1] - preSum[left];
+    }
+
+
 
     public static void main(String[] args) {
         PreSum preSum = new PreSum();
+
         int[] a = {1,2,3,4,5,6};
         int[] b = {1, 3, 6, 10, 15, 21};
         Assert.assertArrayEquals(b, preSum.preSum0(a));
@@ -430,5 +475,13 @@ public class PreSum {
         Assert.assertEquals(7, preSum.subarraysWithKDistinct(subarraysWithKDistinctInput1, k1));
         int[] subarraysWithKDistinctInput2 = {1,2,1,3,4}; int k2 = 3;
         Assert.assertEquals(3, preSum.subarraysWithKDistinct(subarraysWithKDistinctInput2, k2));
+
+        preSum.init(new int[] {-2, 0, 3, -5, 2, -1});
+        int sumRange02 = preSum.sumRange(0, 2);
+        Assert.assertEquals(1,sumRange02);
+        int sumRange25 = preSum.sumRange(2, 5);
+        Assert.assertEquals(-1,sumRange25);
+        int sumRange05 = preSum.sumRange(0, 5);
+        Assert.assertEquals(-3,sumRange05);
     }
 }
